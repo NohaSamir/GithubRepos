@@ -66,8 +66,8 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 
     // Room
-    implementation 'androidx.room:room-runtime:2.2.2'
-    kapt 'androidx.room:room-compiler:2.2.2'
-    annotationProcessor 'androidx.room:room-compiler:2.2.2'
+    implementation "androidx.room:room-runtime:$version_room"
+    kapt "androidx.room:room-compiler:$version_room"
+    annotationProcessor "androidx.room:room-compiler:$version_room"
 
 }
