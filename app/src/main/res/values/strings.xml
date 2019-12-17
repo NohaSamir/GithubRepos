@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GithubRepos</string>
+    <string name="owner">owner</string>
+</resources>
