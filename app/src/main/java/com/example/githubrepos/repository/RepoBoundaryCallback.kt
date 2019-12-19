@@ -54,32 +54,21 @@ class RepoBoundaryCallback(
         if (isRequestInProgress) return
 
         isRequestInProgress = true
-        network.getReposAsync(since).enqueue(object : Callback<List<Repo>> {
-            override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
-                _networkErrors.postValue(t.message ?: "Unknown error")
-                isRequestInProgress = false
-            }
 
-            override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
-                if (response.isSuccessful) {
-                    val repos = response.body() ?: emptyList()
+        coroutineScope.launch {
 
+            withContext(Dispatchers.IO) {
+                try {
+                    val repos = network.getReposAsync(since).await()
+                    isRequestInProgress = false
                     if (repos.isNotEmpty()) since = repos[repos.lastIndex].id
-
-                    coroutineScope.launch {
-                        withContext(Dispatchers.IO) {
-                            cache.insertAll(repos)
-                        }
-                    }
-
-                    isRequestInProgress = false
-
-                } else {
-                    _networkErrors.postValue(response.errorBody()?.string() ?: "Unknown error")
-                    isRequestInProgress = false
+                    cache.insertAll(repos)
+                }catch (e: Exception)
+                {
+                    _networkErrors.postValue(e.message)
                 }
             }
 
-        })
+        }
     }
 }

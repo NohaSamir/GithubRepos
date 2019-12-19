@@ -13,16 +13,6 @@ class GithubRepository(
     private val coroutineScope: CoroutineScope
 ) {
 
-    //val repositories: LiveData<List<Repo>> = cache.getAllRepos()
-
-    /* suspend fun getRepos(since: Int): RepoResult {
-         withContext(Dispatchers.IO) {
-             val repos = network.getReposAsync(since).await()
-             Log.d("Response", "$since $repos")
-             cache.insertAll(repos)
-         }
-     }*/
-
     fun getRepos(): RepoResult {
         // Get data source factory from the local cache
         val dataSourceFactory = cache.getAllRepos()

@@ -7,9 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.githubrepos.domain.Repo
 
-/**
- * Defines methods for using the SleepNight class with Room.
- */
+
 @Dao
 interface ReposDatabaseDao {
 

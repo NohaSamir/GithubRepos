@@ -1,16 +1,17 @@
 package com.example.githubrepos.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.paging.PagedList
 import com.example.githubrepos.Injection
 import com.example.githubrepos.domain.Repo
 import com.example.githubrepos.domain.RepoResult
-import com.example.githubrepos.repository.GithubRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 
 class ReposViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -31,15 +32,7 @@ class ReposViewModel(application: Application) : AndroidViewModel(application) {
 
 
     init {
-        loadRepos()
-    }
-
-    //val repos = repository.getRepos()
-
-    fun loadRepos() {
-        viewModelScope.launch {
-            _repoResult.postValue(repository.getRepos())
-        }
+        _repoResult.postValue(repository.getRepos())
     }
 
     /**

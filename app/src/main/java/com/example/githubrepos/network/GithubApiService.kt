@@ -10,7 +10,7 @@ import retrofit2.http.Query
 interface GithubApiService {
 
     @GET("repositories")
-    fun getReposAsync(@Query("since") since: Int): Call<List<Repo>>
+    fun getReposAsync(@Query("since") since: Int): Deferred<List<Repo>>
 }
 
 /**
