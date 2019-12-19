@@ -9,6 +9,7 @@ import com.squareup.moshi.Json
 data class Repo(
     @PrimaryKey
     val id: Int,
+    @Json(name = "name")
     val title: String?,
     val description: String?,
     @Json(name = "created_at")
