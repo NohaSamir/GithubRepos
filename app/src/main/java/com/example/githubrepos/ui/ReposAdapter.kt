@@ -88,6 +88,7 @@ class ReposAdapter(private val interaction: Interaction? = null) :
 
         }
     }
+    
 
     interface Interaction {
         fun onItemSelected(position: Int, item: Repo)
