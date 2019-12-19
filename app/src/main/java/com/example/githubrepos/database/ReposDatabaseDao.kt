@@ -1,6 +1,6 @@
 package com.example.githubrepos.database
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -34,7 +34,7 @@ interface ReposDatabaseDao {
      * sorted by id in ascending order.
      */
     @Query("SELECT * FROM repositories_table ORDER BY id ASC")
-    fun getAllRepos(): LiveData<List<Repo>>
+    fun getAllRepos(): DataSource.Factory<Int, Repo>
 
 
 }

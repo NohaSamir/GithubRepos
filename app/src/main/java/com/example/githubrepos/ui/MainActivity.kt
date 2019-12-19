@@ -1,27 +1,24 @@
-package com.example.githubrepos
+package com.example.githubrepos.ui
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.githubrepos.database.ReposDatabase
+import androidx.paging.PagedList
+import com.example.githubrepos.R
 import com.example.githubrepos.domain.Repo
-import com.example.githubrepos.network.ReposApi
-import com.example.githubrepos.repository.ReposRepository
-import com.example.githubrepos.ui.ReposAdapter
 import com.example.githubrepos.viewmodel.ReposViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(), ReposAdapter.Interaction {
 
-    private val repository by lazy {
-        ReposRepository(ReposApi.githubApis, ReposDatabase.getInstance(application))
-    }
+
     private val viewModel: ReposViewModel by lazy {
-        ViewModelProviders.of(this, ReposViewModel.Factory(repository))
+        ViewModelProviders.of(this)
             .get(ReposViewModel::class.java)
     }
 
@@ -33,8 +30,12 @@ class MainActivity : AppCompatActivity(), ReposAdapter.Interaction {
 
         recycler.adapter = mAdapter
 
-        viewModel.repos.observe(this, Observer {
+        viewModel.repos.observe(this, Observer<PagedList<Repo>> {
             mAdapter.submitList(it)
+        })
+
+        viewModel.networkErrors.observe(this, Observer {
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
         })
     }
 

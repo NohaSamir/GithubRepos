@@ -1,33 +1,44 @@
 package com.example.githubrepos.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.githubrepos.repository.ReposRepository
+import android.app.Application
+import androidx.lifecycle.*
+import androidx.paging.PagedList
+import com.example.githubrepos.Injection
+import com.example.githubrepos.domain.Repo
+import com.example.githubrepos.domain.RepoResult
+import com.example.githubrepos.repository.GithubRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class ReposViewModel(private val repository: ReposRepository) : ViewModel() {
+class ReposViewModel(application: Application) : AndroidViewModel(application) {
 
     private val viewModelJob = SupervisorJob()
 
     private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
 
-    private var since = 0
+    private val repository by lazy {
+        Injection.provideGithubRepository(application, viewModelScope)
+    }
+
+    private val _repoResult = MutableLiveData<RepoResult>()
+
+    val repos: LiveData<PagedList<Repo>> = Transformations.switchMap(_repoResult) { it -> it.data }
+    val networkErrors: LiveData<String> = Transformations.switchMap(_repoResult) { it ->
+        it.networkErrors
+    }
 
 
     init {
         loadRepos()
     }
 
-    val repos = repository.repositories
+    //val repos = repository.getRepos()
 
     fun loadRepos() {
         viewModelScope.launch {
-            repository.getRepos(since)
-            if(repos.value != null && repos.value!!.isNotEmpty())
-                since = repos.value?.get(repos.value!!.size - 1)?.id ?: 0
+            _repoResult.postValue(repository.getRepos())
         }
     }
 
@@ -38,18 +49,4 @@ class ReposViewModel(private val repository: ReposRepository) : ViewModel() {
         super.onCleared()
         viewModelJob.cancel()
     }
-
-    /**
-     * Factory for constructing ReposViewModel with parameter
-     */
-    class Factory(private val repository: ReposRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(ReposViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return ReposViewModel(repository) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
-    }
-
 }

@@ -3,6 +3,7 @@ package com.example.githubrepos.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,20 +14,21 @@ import com.example.githubrepos.util.formatServerDate
 import kotlinx.android.synthetic.main.item_repo.view.*
 
 class ReposAdapter(private val interaction: Interaction? = null) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    PagedListAdapter<Repo, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Repo>() {
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Repo>() {
 
-        override fun areItemsTheSame(oldItem: Repo, newItem: Repo): Boolean {
-            return oldItem.id == newItem.id
+            override fun areItemsTheSame(oldItem: Repo, newItem: Repo): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Repo, newItem: Repo): Boolean {
+                return oldItem == newItem
+            }
+
         }
-
-        override fun areContentsTheSame(oldItem: Repo, newItem: Repo): Boolean {
-            return oldItem == newItem
-        }
-
     }
-    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -42,28 +44,10 @@ class ReposAdapter(private val interaction: Interaction? = null) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is RepoViewHolder -> {
-                holder.bind(differ.currentList.get(position))
-            }
+        val repoItem = getItem(position)
+        if (repoItem != null) {
+            (holder as RepoViewHolder).bind(repoItem)
         }
-    }
-
-    override fun getItemCount(): Int {
-        return differ.currentList.size
-    }
-
-    fun submitList(list: List<Repo>) {
-
-        differ.submitList(list)
-    }
-
-    fun addItems(list: List<Repo>) {
-
-        val newList = mutableListOf<Repo>()
-        newList.addAll(differ.currentList)
-        newList.addAll(list)
-        differ.submitList(newList)
     }
 
     class RepoViewHolder
